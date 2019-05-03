@@ -1,102 +1,101 @@
-# serverless-php
+# [serverless-php](https://github.com/eserozvataf/serverless-php)
 [![serverless][badge-serverless]](http://www.serverless.com)
 [![language][badge-language]](http://php.net)
 [![license][badge-license]](LICENSE)
 
-PHP for AWS Lambda via Serverless Framework using Symfony components for
-dependency injection.
+[PHPKonf 2019](http://phpkonf.org) Konferansında sunacak olduğum "Serverless PHP" konuşmasının demo sunumudur.
 
-**Latest version is on [master][git-repo]**.
+## Çalıştırmak için adımlar:
 
-[AWS Lambda][aws-lambda-home] lets you run code without thinking about servers.
-Right now you can author your AWS Lambda functions in several langauges
-[natively][aws-lambda-langs], but not PHP. This project aims to provide a fully
-featured shim for authoring your AWS Lambda functions in PHP.
+- Öncelikle sisteminizde node.js'in ve git komut satırı araçlarının kurulu olduğundan emin olun,
 
-More information about how this works and its performance characteristics can
-be found on [my blog post][blog].
-
-## Preview
-```php
-<?php
-
-use Raines\Serverless\Context;
-use Raines\Serverless\Handler;
-
-class HelloHandler implements Handler
-{
-    public function handle(array $event, Context $context)
-    {
-        return [
-            'statusCode' => 200,
-            'body' => 'Hello World!',
-        ];
-    }
-}
+```sh
+$ npm install serverless -g
 ```
 
+- Amazon Web Services'dan Access Keylerinizi temin edin,
 
-# Features
-[Event Data](#Event-Data)   | [Context](#Ccontext)        | [Logging](#Logging)         | [Exceptions](#Exceptions)   | [Environment](#Environment)   | [API Gateway](#Api-Gateway)
-:-------------------------: | :-------------------------: | :-------------------------: | :-------------------------: | :---------------------------: | :-------------------------:
-![full][badge-support-full] | ![full][badge-support-full] | ![part][badge-support-part] | ![none][badge-support-none] | ![full][badge-support-full]   | ![full][badge-support-full]
-
-
-# Usage
-## Prerequisites
-* [Serverless](https://serverless.com/)
-* [Node](https://nodejs.org)
-* [Composer](https://getcomposer.org/)
-* [Git LFS](https://git-lfs.github.com/)
-
-Install this project:
-```
-serverless install --url https://github.com/araines/serverless-php
+```sh
+$ serverless config credentials --provider aws --key KEY --secret SECRET
 ```
 
-Currently `serverless install` does not work with [Git LFS](https://git-lfs.github.com/).
-Hopefully this will be [supported in the future](https://github.com/serverless/serverless/issues/4611),
-but for the moment here are your options:
+veya halihazırda `aws-cli` kullanıcısıysanız
 
-1. Rebuild the PHP binary (described later in this document)
-2. Download the PHP binary directly from [GitHub](https://github.com/araines/serverless-php/raw/master/php)
-3. Instead of using `serverless install`, ensure you have Git LFS installed on
-your system and clone the repository.
-
-## Deploying to AWS
-```
-composer install -o --no-dev
-serverless deploy
+```sh
+$ aws configure
+AWS Access Key ID [None]: KEY
+AWS Secret Access Key [None]: SECRET
+Default region name [None]: eu-west-1
+Default output format [None]: 
 ```
 
-## Running locally
-```
-serverless invoke local -f hello
-```
+komutları ile AWS hesabınızı serverless.js'e tanıtın.
 
-## Running on AWS
-```
-serverless invoke -f hello
-```
+- Bu demoyu git aracılığı ile klonlayın.
 
-
-# Rebuilding PHP Binary
-The PHP binary can be built with any flags you require and at any version.
-
-## Prerequisites
-* [Docker](https://www.docker.com/)
-
-## Compiling
-```
-sh buildphp.sh
+```sh
+$ git clone https://github.com/eserozvataf/serverless-php
+$ cd serverless-php
 ```
 
-## Altering compile flags etc
-Edit `buildphp.sh` and `dockerfile.buildphp` to alter it.
+- Demo klasörüne composer bağımlılıklarını indirin.
 
+```sh
+$ composer install -o --no-dev
+```
 
-# Thanks
-* [Robert Anderson][git-zerosharp] for the inspiration and base for this project
+- `serverless.yml` dosyası içerisine bir göz gezdirin.
+
+- Serverless.js aracılığı ile deployment'i başlatın.
+
+```sh
+$ sls deploy
+```
+
+## İhtiyaç halinde PHP'i tekrar derlemek
+
+Bazı durumlarda PHP'i tekrar compile etmeniz/derlemeniz gerekebilir, bunun için mutlaka
+[Docker](https://docker.com) kurulu bir cihaz üzerinde işlem yapmanız gerekecektir. Bu
+işlemden önce kod tabanında bulunan `buildphp.sh` ve `dockerfile.buildphp` dosyalarını
+da incelemeniz gerekebilir.
+
+```sh
+$ sh buildphp.sh
+```
+
+## Loglara erişmek:
+
+Bir kere deploy işlemi yaptıktan sonra ilgili fonksiyona gelecek requestleri aşağıdaki komut ile izleyebilirsiniz.
+
+```sh
+$ sls logs -f hello -t
+```
+
+hello burada izleyeceğimiz fonksiyonun ismi.
+
+## Bir işlevi lokal olarak çalıştırmak:
+
+```sh
+$ sls invoke local -f hello
+```
+
+## Bir işlevi AWS üzerinde çalıştırmak:
+
+```sh
+$ sls invoke -f hello
+```
+
+## İptal etmek:
+
+Deploy ettiğiniz bir projeyi komple geri çekmek için aşağıdaki komutu kullanabilirsiniz:
+
+```sh
+$ sls remove
+```
+
+# Teşekkür
+[Robert Anderson](https://github.com/ZeroSharp/serverless-php) ve [Andy Raines](https://github.com/araines/serverless-php)'e
+bu referans aldığım projeleri için teşekkürlerimi iletiyorum.
 
 
 [badge-serverless]:   http://public.serverless.com/badges/v3.svg
@@ -105,11 +104,3 @@ Edit `buildphp.sh` and `dockerfile.buildphp` to alter it.
 [badge-support-full]: https://img.shields.io/badge/support-full-green.svg
 [badge-support-part]: https://img.shields.io/badge/support-partial-yellow.svg
 [badge-support-none]: https://img.shields.io/badge/support-none-red.svg
-
-[aws-lambda-home]:  https://aws.amazon.com/lambda/
-[aws-lambda-langs]: http://docs.aws.amazon.com/lambda/latest/dg/lambda-app.html#lambda-app-author
-
-[git-repo]:      https://github.com/araines/serverless-php
-[git-zerosharp]: https://github.com/ZeroSharp/serverless-php
-
-[blog]: https://medium.com/@araines/serverless-php-630bb3e950f5
